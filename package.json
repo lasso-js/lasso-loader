@@ -3,7 +3,7 @@
     "description": "Module to support lazy loading of JavaScript and CSS resources",
     "repository": {
         "type": "git",
-        "url": "https://github.com/raptorjs3/raptor-loader.git"
+        "url": "https://github.com/raptorjs/raptor-loader.git"
     },
     "scripts": {
         "test": "node_modules/.bin/mocha --ui bdd --reporter spec  ./test"
