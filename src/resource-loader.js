@@ -36,16 +36,17 @@ function insertEl(el) {
 exports.js = function(src, callback, attributes) {
 
     attributes = attributes || {};
-    
+
     var complete = false;
-    
+    var el;
+
     function success() {
         if (complete === false) {
             complete = true;
             callback();
         }
     }
-    
+
     function error(err) {
         if (complete === false) {
             complete = true;
@@ -53,7 +54,7 @@ exports.js = function(src, callback, attributes) {
             callback(err || 'unknown error');
         }
     }
-    
+
     extend(attributes, {
         type: 'text/javascript',
         src: src,
@@ -64,12 +65,12 @@ exports.js = function(src, callback, attributes) {
         },
 
         onload: success,
-        
+
         onerror: error
     });
-    
-    var el = createEl('script', attributes);
-    
+
+    el = createEl('script', attributes);
+
     if (el.addEventListener) {
         try {
             el.addEventListener('load', function() {
@@ -84,17 +85,17 @@ exports.js = function(src, callback, attributes) {
 exports.css = function(href, callback, attributes) {
 
     var retries = 20;
-    
+
     var complete = false;
-    
+
     var el = createEl('link');
-    
+
     function cleanup() {
         el.onload = null;
         el.onreadystatechange = null;
         el.onerror = null;
     }
-    
+
     function isLoaded() {
         var sheets = document.styleSheets;
         for (var idx = 0, len = sheets.length; idx < len; idx++) {
@@ -113,7 +114,7 @@ exports.css = function(href, callback, attributes) {
             callback();
         }
     }
-    
+
     function pollSuccess() {
         if (complete === false) {
             if (!isLoaded() && (retries--)) {
@@ -122,9 +123,9 @@ exports.css = function(href, callback, attributes) {
             success();
         }
     }
-    
+
     function error(err) {
-    
+
         if (complete === false) {
             complete = true;
             cleanup();
@@ -132,17 +133,17 @@ exports.css = function(href, callback, attributes) {
             callback(err || 'unknown error');
         }
     }
-    
+
     extend(el, {
         type: 'text/css',
         rel: 'stylesheet',
         href: href
     });
-    
+
     if (attributes) {
         extend(el, attributes);
     }
-    
+
     if (navigator.appName === 'Microsoft Internet Explorer') {
         el.onload = success;
         el.onreadystatechange = function() {
@@ -157,7 +158,7 @@ exports.css = function(href, callback, attributes) {
         //For non-IE browsers we don't get the "onload" and "onreadystatechange" events...
         pollSuccess();
     }
-    
+
     el.onerror = error;
     insertEl(el);
 };

@@ -89,7 +89,7 @@ function load(resources, callback) {
 }
 
 function async(asyncId, callback) {
-    var loaderMeta = window.$rloaderMeta;
+    var loaderMeta = window.$lassoLoaderMeta;
     var resources = loaderMeta ? loaderMeta[asyncId] : null;
     if (!resources) {
         throw new Error('Loader metadata missing for "' + asyncId + '"');

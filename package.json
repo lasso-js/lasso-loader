@@ -1,9 +1,9 @@
 {
-    "name": "raptor-loader",
+    "name": "lasso-loader",
     "description": "Module to support lazy loading of JavaScript and CSS resources",
     "repository": {
         "type": "git",
-        "url": "https://github.com/raptorjs/raptor-loader.git"
+        "url": "https://github.com/lasso-js/lasso-loader.git"
     },
     "scripts": {
         "test": "node_modules/.bin/mocha --ui bdd --reporter spec  ./test"
@@ -18,11 +18,11 @@
         "mocha": "~1.15.1",
         "chai": "~1.8.1"
     },
-    "license": "Apache License v2.0",
+    "license": "Apache-2.0",
     "bin": {},
-    "main": "lib/raptor-loader.js",
+    "main": "src/index.js",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
-    "version": "1.0.5"
+    "version": "2.0.0"
 }
