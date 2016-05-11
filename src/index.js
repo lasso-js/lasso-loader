@@ -45,18 +45,9 @@ function start(resourceType, url) {
 function load(resources, callback) {
     var errorMessages = [];
     var pendingCount = 0;
-    var settled = false;
+    var allProcessed = false;
 
     function done() {
-        // It's possible that the `listener` can be invoked before
-        // `process(...)` functions return which can cause `done()`
-        // to be called twice.
-        // See https://github.com/lasso-js/lasso-loader/issues/1
-        if (settled) {
-            return;
-        }
-
-        settled = true;
         if (errorMessages.length) {
             callback('Failed: ' + errorMessages.join(', '));
         } else {
@@ -69,7 +60,12 @@ function load(resources, callback) {
             errorMessages.push(url + ' (' + err + ')');
         }
 
-        if (--pendingCount === 0) {
+        // It's possible that the `listener` can be invoked before
+        // `process(...)` functions return which can cause `done()`
+        // to be called twice. We only invoke `done()` if we
+        // both of the `process(...)` functions have returned.
+        // See https://github.com/lasso-js/lasso-loader/issues/1
+        if ((--pendingCount === 0) && allProcessed) {
             done();
         }
     }
@@ -92,6 +88,10 @@ function load(resources, callback) {
 
     process('css');
     process('js');
+
+    // Set flag to indicate that we finished processing all of the css and js
+    // and we're waiting to be notified when they complete.
+    allProcessed = true;
 
     if (pendingCount === 0) {
         done();
