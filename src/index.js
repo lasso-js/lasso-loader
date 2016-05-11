@@ -45,8 +45,18 @@ function start(resourceType, url) {
 function load(resources, callback) {
     var errorMessages = [];
     var pendingCount = 0;
+    var settled = false;
 
     function done() {
+        // It's possible that the `listener` can be invoked before
+        // `process(...)` functions return which can cause `done()`
+        // to be called twice.
+        // See https://github.com/lasso-js/lasso-loader/issues/1
+        if (settled) {
+            return;
+        }
+
+        settled = true;
         if (errorMessages.length) {
             callback('Failed: ' + errorMessages.join(', '));
         } else {
