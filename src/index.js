@@ -1,3 +1,9 @@
+// the lasso module system exposes the loader metadata through a semi-private property
+var loaderMeta = module.__loaderMetadata;
+
+// the lasso module system exposes the module runtime through a semi-private property
+var modulesRuntime = module.__runtime;
+
 var resourceLoader = require('./resource-loader');
 var EventEmitter = require('events').EventEmitter;
 
@@ -99,31 +105,24 @@ function load(resources, callback) {
 }
 
 function async(asyncId, callback) {
-    var loaderMeta = window.$lassoLoaderMeta;
-    var resources = loaderMeta ? loaderMeta[asyncId] : null;
-    if (!resources) {
+    var resources;
+    if (!(resources = loaderMeta[asyncId])) {
         throw new Error('Loader metadata missing for "' + asyncId + '"');
     }
 
-    var job;
-    var modulesRuntime = require.runtime;
-    if (modulesRuntime) {
-        // Create a pending job in the module runtime system which will
-        // prevent any "require-run" modules from running if they are
-        // configured to wait until ready.
-        // When all pending jobs are completed, the "require-run" modules
-        // that have been queued up will be ran.
-        job = modulesRuntime.pending();
-    }
+    // Create a pending job in the module runtime system which will
+    // prevent any "require-run" modules from running if they are
+    // configured to wait until ready.
+    // When all pending jobs are completed, the "require-run" modules
+    // that have been queued up will be ran.
+    var job = modulesRuntime.pending();
 
     load(resources, function(err, result) {
-        // Trigger "ready" event in raptor modules runtime to trigger running
-        // require-run modules that were loaded asynchronously
-        if (job) {
-            // let the module system know that we are done with pending job
-            // of loading modules
-            job.done(err);
-        }
+        // Trigger "ready" event in modules runtime to trigger running
+        // require-run modules that were loaded asynchronously.
+        // Let the module system know that we are done with pending job
+        // of loading modules
+        job.done(err);
 
         callback(err, result);
     });
