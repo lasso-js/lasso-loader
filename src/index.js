@@ -1,6 +1,3 @@
-// the lasso module system exposes the loader metadata through a semi-private property
-var loaderMeta = module.__loaderMetadata;
-
 // the lasso module system exposes the module runtime through a semi-private property
 var modulesRuntime = module.__runtime;
 
@@ -105,8 +102,11 @@ function load(resources, callback) {
 }
 
 function async(asyncId, callback) {
+    // the lasso module system exposes the loader metadata through a semi-private property
+    var loaderMeta = module.__loaderMetadata;
+
     var resources;
-    if (!(resources = loaderMeta[asyncId])) {
+    if (!loaderMeta || !(resources = loaderMeta[asyncId])) {
         throw new Error('Loader metadata missing for "' + asyncId + '"');
     }
 
