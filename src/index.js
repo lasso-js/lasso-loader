@@ -101,13 +101,45 @@ function load(resources, callback) {
     }
 }
 
+function _handleMissingAsync(asyncId) {
+    if (asyncId.charAt(0) === '_') {
+        return;
+    } else {
+        throw new Error('No loader metadata for ' + asyncId);
+    }
+}
+
 function async(asyncId, callback) {
     // the lasso module system exposes the loader metadata through a semi-private property
     var loaderMeta = module.__loaderMetadata;
 
     var resources;
-    if (!loaderMeta || !(resources = loaderMeta[asyncId])) {
-        throw new Error('Loader metadata missing for "' + asyncId + '"');
+
+    if (!loaderMeta) {
+        return callback();
+    }
+
+    if (Array.isArray(asyncId)) {
+        resources = {
+            js: [],
+            css: []
+        };
+        asyncId.forEach(function(asyncId) {
+            var curResources = loaderMeta[asyncId];
+            if (curResources) {
+                ['js', 'css'].forEach(function(key) {
+                    var paths = curResources[key];
+                    if (paths) {
+                        resources[key] = resources[key].concat(paths);
+                    }
+                });
+            } else {
+                _handleMissingAsync(asyncId);
+            }
+        });
+    } else if (!(resources = loaderMeta[asyncId])) {
+        _handleMissingAsync(asyncId);
+        return callback();
     }
 
     // Create a pending job in the module runtime system which will
